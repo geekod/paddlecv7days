@@ -68,21 +68,21 @@ test_reader = paddle.batch(reader=data_reader('./test_data.list'), batch_size=32
 #定义DNN网络
 class MyDNN(fluid.dygraph.Layer):
     def __init__(self):
-        super(MyDNN,self).__init__()
-        self.hidden1 = Linear()
-        self.hidden2 = Linear()
-        self.hidden3 = Linear()
-        self.hidden4 = Linear()
-    def forward(self,input):
-       
-
-
-
-
-       
+        super(MyDNN, self).__init__()
+        self.hidden1 = Linear(100, 300, act="relu")
+        self.hidden2 = Linear(300, 300, act="relu")
+        self.hidden3 = Linear(300, 100, act="relu")
+        self.hidden4 = Linear(3*100*100, 10, act="softmax")
+        
+    def forward(self, input):
+        x = self.hidden1(input)
+        x = self.hidden2(x)
+        x = self.hidden3(x)
+        x = fluid.layers.reshape(x, shape=[-1, 3*100*100])
+        y = self.hidden4(x)
         return y
 
-
+    
 #用动态图进行训练
 with fluid.dygraph.guard():
     model=MyDNN() #模型实例化
